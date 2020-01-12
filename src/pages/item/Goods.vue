@@ -30,7 +30,7 @@
     <v-divider/>
     <v-data-table
       :headers="headers"
-      :items="items"
+      :items="goodsList"
       :pagination.sync="pagination"
       :total-items="totalItems"
       :loading="loading"
@@ -92,7 +92,7 @@
 
 <script>
   import GoodsForm from './GoodsForm'
-  import {goodsData} from "../../mockDB";
+  // import {goodsData} from "../../mockDB";
 
   export default {
     name: "item",
@@ -106,7 +106,7 @@
           saleable: true,
         },// 过滤字段
         totalItems: 0,// 总条数
-        items: [],// 表格数据
+        goodsList: [],// 表格数据
         loading: true,
         pagination: {},// 分页信息
         headers: [// 表头
@@ -137,6 +137,7 @@
       }
     },
     mounted() {
+      console.log("123331313123")
       this.getDataFromApi();
     },
     methods: {
@@ -202,12 +203,27 @@
       },
       getDataFromApi() {
         this.loading = true;
-        setTimeout(() => {
+        this.$http.get("/item/spu/page/", {
+          params : {
+            key: this.search.key, //
+            saleable: this.search.saleable == 0 ? null : this.search.saleable, // 上下架
+            page: this.pagination.page, // 当前页
+            rows: this.pagination.rowsPerPage //每页大小
+          }
+        }).then(res => {
+          this.goodsList = res.data.items
+          this.totalItems = res.data.total
+          this.loading = false;
+        })
+
+       /* setTimeout(() => {
           // 返回假数据
-          this.items = goodsData.slice(0, 4);
+          this.$http()
+          this.items =
+            //goodsData.slice(0, 4);
           this.totalItems = 25;
           this.loading = false;
-        }, 300)
+        }, 300)*/
       }
     }
   }
